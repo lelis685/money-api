@@ -2,6 +2,7 @@ package com.demo.resource;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,8 @@ public class CategoriaResource {
 
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Categoria> listar(@PathVariable(name = "codigo") Long codigo) {
-		return ResponseEntity.ok(categoriaRepository.findById(codigo).get());
+		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+		return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping
@@ -43,5 +45,9 @@ public class CategoriaResource {
 
 		return ResponseEntity.created(uri).build();
 	}
+
+
+
+
 
 }
