@@ -16,34 +16,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.demo.model.Categoria;
-import com.demo.repository.CategoriaRepository;
+import com.demo.model.Pessoa;
+import com.demo.repository.PessoaRepository;
 
 @RestController
-@RequestMapping("/categorias")
-public class CategoriaResource {
+@RequestMapping("/pessoas")
+public class PessoaResource {
 
 	@Autowired
-	private CategoriaRepository categoriaRepository;
+	private PessoaRepository pessoaRepository;
 
 	@GetMapping
-	public List<Categoria> listar() {
-		return categoriaRepository.findAll();
+	public List<Pessoa> listar() {
+		return pessoaRepository.findAll();
 	}
 
 	@GetMapping("/{codigo}")
-	public ResponseEntity<Categoria> listar(@PathVariable(name = "codigo") Long codigo) {
-		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
-		return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
+	public ResponseEntity<Pessoa> listar(@PathVariable(name = "codigo") Long codigo) {
+		Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
+		return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping
-	public ResponseEntity<Categoria> salvar(@Valid @RequestBody Categoria categoria) {
+	public ResponseEntity<Pessoa> salvar(@Valid @RequestBody Pessoa Pessoa) {
 
-		Categoria categoriaSalva = categoriaRepository.save(categoria);
+		Pessoa pessoaSalva = pessoaRepository.save(Pessoa);
 
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-				.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+				.buildAndExpand(pessoaSalva.getCodigo()).toUri();
 
 		return ResponseEntity.created(uri).build();
 	}
