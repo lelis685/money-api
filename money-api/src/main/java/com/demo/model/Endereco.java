@@ -12,26 +12,20 @@ public class Endereco {
 	private String logradouro;
 	
 	@NotNull
-	@Size(max=50 ,min=3)
 	private String numero;
 
-	@Size(max=50 ,min=3)
 	private String complemento;
 	
 	@NotNull
-	@Size(max=50 ,min=3)
 	private String bairro;
 	
 	@NotNull
-	@Size(max=50 ,min=3)
 	private String cep;
 	
 	@NotNull
-	@Size(max=50 ,min=3)
 	private String cidade;
 	
 	@NotNull
-	@Size(max=50 ,min=3)
 	private String estado;
 
 	public String getLogradouro() {
