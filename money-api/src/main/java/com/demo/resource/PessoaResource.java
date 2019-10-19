@@ -1,7 +1,7 @@
 package com.demo.resource;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,46 +22,57 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.event.RecursoCriadoEvent;
 import com.demo.model.Pessoa;
-import com.demo.repository.PessoaRepository;
+import com.demo.service.PessoaService;
 
 @RestController
 @RequestMapping("/pessoas")
 public class PessoaResource {
 
 	@Autowired
-	private PessoaRepository pessoaRepository;
-	
+	private PessoaService pessoaService;
+
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
+	
 	@GetMapping
 	public List<Pessoa> listar() {
-		return pessoaRepository.findAll();
-	}
-
-	@GetMapping("/{codigo}")
-	public ResponseEntity<Pessoa> encontrarPorCodigo(@PathVariable(name = "codigo") Long codigo) {
-		Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
-		return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
+		return pessoaService.listar();
 	}
 
 	
+	@GetMapping("/{codigo}")
+	public ResponseEntity<Pessoa> encontrarPorCodigo(@PathVariable(name = "codigo") Long codigo) {
+		return ResponseEntity.ok(pessoaService.buscarPessoaPeloCodigo(codigo));
+	}
+	
+
 	@PostMapping
-	public ResponseEntity<Pessoa> salvar(@Valid @RequestBody Pessoa Pessoa,HttpServletResponse response) {
-
-		Pessoa pessoaSalva = pessoaRepository.save(Pessoa);
-		
-		publisher.publishEvent(new RecursoCriadoEvent(this,response, pessoaSalva.getCodigo()));
-
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<Pessoa> salvar(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response) {
+		Pessoa pessoaSalva = pessoaService.salvar(pessoa);
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalva.getCodigo()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(pessoaService.salvar(pessoaSalva));
 	}
 
-
+	
 	@DeleteMapping("/{codigo}")
-	@ResponseStatus(value=HttpStatus.NO_CONTENT)
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void deletarPorCodigo(@PathVariable(name = "codigo") Long codigo) {
-		 pessoaRepository.deleteById(codigo);
+		pessoaService.deletarPorCodigo(codigo);
 	}
 
+	
+	@PutMapping("/{codigo}")
+	public ResponseEntity<Pessoa> atualizar(@PathVariable(name = "codigo") Long codigo, @RequestBody Pessoa pessoa) {
+		Pessoa pessoaSalva = pessoaService.atualizar(codigo, pessoa);
+		return ResponseEntity.ok(pessoaSalva);
+	}
+
+	
+	@PutMapping("/{codigo}/ativo")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	public void atualizarPropriedadeAtivo(@PathVariable(name = "codigo") Long codigo,@RequestBody Map<String, Boolean> ativo) {
+		pessoaService.atualizarPropriedadeAtivo(codigo, ativo);
+	}
 
 }

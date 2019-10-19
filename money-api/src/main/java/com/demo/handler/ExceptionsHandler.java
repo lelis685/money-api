@@ -17,34 +17,36 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
-	
+
 	@Autowired
 	private MessageSource messageSource;
-	
+
+
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-		List<Error> errors = Arrays.asList(new Error(messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale()), ex.getCause().toString()));
-
+		
+		String mensagemUsuario = messageSource.getMessage( "mensagem.invalida", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ex.getCause()!= null ? ex.getCause().toString() : ex.toString();
+		
+		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, errors, headers, HttpStatus.BAD_REQUEST, request);
 	}
+
 
 
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
 		return handleExceptionInternal(ex,listarErrors(ex.getBindingResult()), headers, HttpStatus.BAD_REQUEST, request);
 	}
-	
+
 	@ExceptionHandler(EmptyResultDataAccessException.class)
 	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
 		String mensagemUsuario = messageSource.getMessage("recurso.nao-encontrado", null, LocaleContextHolder.getLocale());
@@ -64,7 +66,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
 		return errors;
 	}
-	
-	
+
+
 
 }

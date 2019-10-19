@@ -29,6 +29,16 @@ public class Pessoa {
 
 	@NotNull
 	private Boolean ativo;
+	
+	
+	public Pessoa() {
+	}
+
+	public Pessoa(String nome, Endereco endereco, Boolean ativo) {
+		this.nome = nome;
+		this.endereco = endereco;
+		this.ativo = ativo;
+	}
 
 	public Long getCodigo() {
 		return codigo;
