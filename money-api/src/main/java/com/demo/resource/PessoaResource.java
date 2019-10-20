@@ -36,8 +36,8 @@ public class PessoaResource {
 
 	
 	@GetMapping
-	public List<Pessoa> listar() {
-		return pessoaService.listar();
+	public ResponseEntity<List<Pessoa>> listar() {
+		return ResponseEntity.ok(pessoaService.listar());
 	}
 
 	
