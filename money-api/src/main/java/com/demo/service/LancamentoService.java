@@ -19,6 +19,10 @@ public class LancamentoService {
 	public List<Lancamento> listar() {
 		return lancamentoRepository.findAll();
 	}
+	
+	public Lancamento salvar(Lancamento lancamento) {
+		return lancamentoRepository.save(lancamento);
+	}
 
 
 	public Lancamento buscarCategoriaPeloCodigo(Long codigo) {
