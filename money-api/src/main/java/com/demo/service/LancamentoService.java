@@ -7,7 +7,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.demo.model.Lancamento;
+import com.demo.model.Pessoa;
 import com.demo.repository.LancamentoRepository;
+import com.demo.repository.PessoaRepository;
+import com.demo.service.exception.PessoaInexistenteOuInativaException;
 
 @Service
 public class LancamentoService {
@@ -15,15 +18,20 @@ public class LancamentoService {
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
 
-	
+	@Autowired
+	private PessoaRepository pessoaRepository;
+
 	public List<Lancamento> listar() {
 		return lancamentoRepository.findAll();
 	}
-	
+
 	public Lancamento salvar(Lancamento lancamento) {
+		Pessoa pessoa = pessoaRepository.findById(lancamento.getPessoa().getCodigo()).orElse(null);
+		if (pessoa == null || pessoa.isInativo()) {
+			throw new PessoaInexistenteOuInativaException();
+		}
 		return lancamentoRepository.save(lancamento);
 	}
-
 
 	public Lancamento buscarCategoriaPeloCodigo(Long codigo) {
 		Lancamento lancamentoSalvo = lancamentoRepository.findById(codigo).orElse(null);
@@ -32,8 +40,5 @@ public class LancamentoService {
 		}
 		return lancamentoSalvo;
 	}
-	
-	
 
-	
 }

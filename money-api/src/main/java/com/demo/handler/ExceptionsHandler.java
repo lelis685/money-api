@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.demo.service.exception.PessoaInexistenteOuInativaException;
+
 @ControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
@@ -29,55 +31,57 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 	private MessageSource messageSource;
 
 	
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request){
+	@ExceptionHandler(PessoaInexistenteOuInativaException.class)
+	public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex,WebRequest request) {
+		String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null,LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ex.toString();
+		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
+		return handleExceptionInternal(ex, errors, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+	}
+
 	
-		String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitida", null, LocaleContextHolder.getLocale());
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,WebRequest request) {
+
+		String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitida", null,LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
 		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, errors, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-		
+
 	}
 
+	
 	@Override
-	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		
-		String mensagemUsuario = messageSource.getMessage( "mensagem.invalida", null, LocaleContextHolder.getLocale());
-		String mensagemDesenvolvedor = ex.getCause()!= null ? ex.getCause().toString() : ex.toString();
-		
+	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,HttpHeaders headers, HttpStatus status, WebRequest request) {
+		String mensagemUsuario = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
 		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, errors, headers, HttpStatus.BAD_REQUEST, request);
 	}
 
-
-
+	
 	@Override
-	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		return handleExceptionInternal(ex,listarErrors(ex.getBindingResult()), headers, HttpStatus.BAD_REQUEST, request);
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,HttpHeaders headers, HttpStatus status, WebRequest request) {
+		return handleExceptionInternal(ex, listarErrors(ex.getBindingResult()), headers, HttpStatus.BAD_REQUEST,request);
 	}
 
+	
 	@ExceptionHandler(EmptyResultDataAccessException.class)
-	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
-		String mensagemUsuario = messageSource.getMessage("recurso.nao-encontrado", null, LocaleContextHolder.getLocale());
+	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex,WebRequest request) {
+		String mensagemUsuario = messageSource.getMessage("recurso.nao-encontrado", null,LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ex.toString();
 		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, errors, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
 
-
-	private  List<Error> listarErrors(BindingResult result){
-
+	
+	private List<Error> listarErrors(BindingResult result) {
 		List<Error> errors = new ArrayList<>();
-
 		for (FieldError error : result.getFieldErrors()) {
 			errors.add(new Error(messageSource.getMessage(error, LocaleContextHolder.getLocale()), error.toString()));
 		}
-
 		return errors;
 	}
-
-
 
 }
