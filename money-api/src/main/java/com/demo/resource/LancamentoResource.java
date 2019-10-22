@@ -1,12 +1,12 @@
 package com.demo.resource;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,8 +36,8 @@ public class LancamentoResource {
 
 	
 	@GetMapping
-	public ResponseEntity<List<Lancamento>> pesquisar(LancamentoFilter filter){
-		return ResponseEntity.ok(lancamentoService.filtrar(filter));
+	public Page<Lancamento> pesquisar(LancamentoFilter filter, Pageable pageable){
+		return lancamentoService.filtrar(filter,pageable);
 	}
 	
 
@@ -54,10 +54,17 @@ public class LancamentoResource {
 		return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
 	}
 
+	
 	@DeleteMapping("/{codigo}")
 	@ResponseStatus(value=HttpStatus.NO_CONTENT)
 	public void deletarPeloCodigo(@PathVariable("codigo") Long codigo){
 		lancamentoService.deletarLancamentoPeloCodigo(codigo);
 	}
 
+	
+	
+	
+	
+	
+	
 }
