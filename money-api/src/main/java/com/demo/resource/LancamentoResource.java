@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.event.RecursoCriadoEvent;
 import com.demo.model.Lancamento;
+import com.demo.repository.filter.LancamentoFilter;
 import com.demo.service.LancamentoService;
 
 @RestController
@@ -31,24 +32,25 @@ public class LancamentoResource {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
+	
 	@GetMapping
-	public ResponseEntity<List<Lancamento>> listar(){
-		return ResponseEntity.ok(lancamentoService.listar());
+	public ResponseEntity<List<Lancamento>> pesquisar(LancamentoFilter filter){
+		return ResponseEntity.ok(lancamentoService.filtrar(filter));
 	}
-
+	
 
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Lancamento> buscarCategoriaPeloCodigo(@PathVariable("codigo") Long codigo){
 		return ResponseEntity.ok(lancamentoService.buscarCategoriaPeloCodigo(codigo));
 	}
 
+	
 	@PostMapping
 	public ResponseEntity<Lancamento> salvar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response){
 		Lancamento lancamentoSalvo = lancamentoService.salvar(lancamento);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamentoSalvo.getCodigo()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
 	}
-
 
 
 
