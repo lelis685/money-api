@@ -22,7 +22,7 @@ public class LancamentoService {
 	@Autowired
 	private PessoaRepository pessoaRepository;
 
-	
+
 	public Lancamento salvar(Lancamento lancamento) {
 		Pessoa pessoa = pessoaRepository.findById(lancamento.getPessoa().getCodigo()).orElse(null);
 		if (pessoa == null || pessoa.isInativo()) {
@@ -31,19 +31,25 @@ public class LancamentoService {
 		return lancamentoRepository.save(lancamento);
 	}
 
-	
-	public Lancamento buscarCategoriaPeloCodigo(Long codigo) {
+
+	public Lancamento buscarLancamentoPeloCodigo(Long codigo) {
 		Lancamento lancamentoSalvo = lancamentoRepository.findById(codigo).orElse(null);
 		if (lancamentoSalvo == null) {
 			throw new EmptyResultDataAccessException(1);
 		}
 		return lancamentoSalvo;
 	}
-	
-	
+
+
 	public List<Lancamento> filtrar(LancamentoFilter lancamentoFilter) {
 		return lancamentoRepository.filtrar(lancamentoFilter);
 	}
-	
+
+
+	public void deletarLancamentoPeloCodigo(Long codigo) {
+		buscarLancamentoPeloCodigo(codigo);
+		lancamentoRepository.deleteById(codigo);
+	}
+
 
 }
