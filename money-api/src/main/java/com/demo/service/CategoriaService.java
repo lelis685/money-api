@@ -26,11 +26,11 @@ public class CategoriaService {
 
 	public void deletarPorCodigo(Long codigo) {
 		buscarCategoriaPeloCodigo(codigo);
-		categoriaRepository.deleteById(codigo);
+		categoriaRepository.delete(codigo);
 	}
 
 	public Categoria buscarCategoriaPeloCodigo(Long codigo) {
-		Categoria categoriaSalva = categoriaRepository.findById(codigo).orElse(null);
+		Categoria categoriaSalva = categoriaRepository.findOne(codigo);
 		if (categoriaSalva == null) {
 			throw new EmptyResultDataAccessException(1);
 		}
