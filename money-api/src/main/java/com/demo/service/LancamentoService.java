@@ -1,5 +1,7 @@
 package com.demo.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import com.demo.model.Pessoa;
 import com.demo.repository.LancamentoRepository;
 import com.demo.repository.PessoaRepository;
 import com.demo.repository.filter.LancamentoFilter;
+import com.demo.repository.projection.ResumoLancamento;
 import com.demo.service.exception.PessoaInexistenteOuInativaException;
 
 @Service
@@ -43,6 +46,10 @@ public class LancamentoService {
 
 	public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
 		return lancamentoRepository.filtrar(lancamentoFilter,pageable);
+	}
+	
+	public List<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		return lancamentoRepository.resumir(lancamentoFilter,pageable);
 	}
 
 

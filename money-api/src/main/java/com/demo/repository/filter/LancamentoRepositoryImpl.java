@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import com.demo.model.Lancamento;
+import com.demo.repository.projection.ResumoLancamento;
 
 public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 
@@ -39,6 +40,30 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 		adicionarRestricoesPaginacao(query , pageable);
 
 		return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter) );
+	}
+	
+	
+	@Override
+	public List<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<ResumoLancamento> criteria =  builder.createQuery(ResumoLancamento.class);
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		criteria.select(builder.construct(ResumoLancamento.class
+				,root.get("codigo"),root.get("descricao")
+				,root.get("dataVencimento"),root.get("dataPagamento")
+				,root.get("valor"),root.get("tipo")
+				,root.get("categoria").get("nome")
+				,root.get("pessoa").get("nome")));
+		
+		Predicate[] predicates = buildRestricoes(lancamentoFilter,builder,root);
+		criteria.where(predicates);
+
+		TypedQuery<ResumoLancamento> query = manager.createQuery(criteria);
+		adicionarRestricoesPaginacao(query , pageable);
+		
+		return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter) ).getContent();
 	}
 
 
@@ -63,7 +88,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 	}
 
 
-	private void adicionarRestricoesPaginacao(TypedQuery<Lancamento> query, Pageable pageable) {
+	private void adicionarRestricoesPaginacao(TypedQuery<?> query, Pageable pageable) {
 		int paginaAtual = pageable.getPageNumber();
 		int totalRegistrosPorPagina = pageable.getPageSize();
 		int primeiroRegistroDaPagina = paginaAtual * totalRegistrosPorPagina;
@@ -86,5 +111,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 		return manager.createQuery(criteria).getSingleResult();
 	}
 
+
+	
 
 }
