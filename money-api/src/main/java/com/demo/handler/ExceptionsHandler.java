@@ -37,7 +37,6 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 		String mensagemDesenvolvedor = ex.toString();
 		List<Error> errors = Arrays.asList(new Error(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, errors, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-
 	}
 
 	

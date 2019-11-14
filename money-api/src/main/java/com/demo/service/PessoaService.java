@@ -20,6 +20,10 @@ public class PessoaService {
 	public List<Pessoa> listar() {
 		return pessoaRepository.findAll();
 	}
+	
+	public List<Pessoa> pesquisarPorNome(String nome) {
+		return pessoaRepository.findByNomeContaining(nome);
+	}
 
 	public Pessoa salvar(Pessoa Pessoa) {
 		return pessoaRepository.save(Pessoa);
